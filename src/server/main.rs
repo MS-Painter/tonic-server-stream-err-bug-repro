@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<(dyn std::error::Error + 'static)>> {
     let socket = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8080);
     let (trace_tx, _) = broadcast::channel(10);
     let server = Server {
-        handlers_trace_tx: Arc::new(trace_tx),
+        trace_tx: Arc::new(trace_tx),
     };
 
     TonicServer::builder()
@@ -28,7 +28,7 @@ async fn main() -> Result<(), Box<(dyn std::error::Error + 'static)>> {
 }
 
 struct Server {
-    pub handlers_trace_tx: Arc<broadcast::Sender<Result<TraceResponse, tonic::Status>>>,
+    pub trace_tx: Arc<broadcast::Sender<Result<TraceResponse, tonic::Status>>>,
 }
 
 #[tonic::async_trait]
@@ -40,7 +40,7 @@ impl TraceService for Server {
         &self,
         request: Request<TraceRequest>,
     ) -> Result<Response<Self::TraceStream>, tonic::Status> {
-        let mut rx = self.handlers_trace_tx.subscribe();
+        let mut rx = self.trace_tx.subscribe();
         let rx_stream = Box::pin(async_stream::stream! {
             while let Ok(item) = rx.recv().await {
                 yield item;
@@ -53,7 +53,7 @@ impl TraceService for Server {
         &self,
         request: tonic::Request<SendErrRequest>,
     ) -> Result<tonic::Response<SendErrResponse>, tonic::Status> {
-        let _ = self.handlers_trace_tx.send(Err(tonic::Status::cancelled("Handler runtime ended")));
+        let _ = self.trace_tx.send(Err(tonic::Status::cancelled("Handler runtime ended")));
         Ok(Response::new(SendErrResponse {
             message: "".to_string(),
         }))
