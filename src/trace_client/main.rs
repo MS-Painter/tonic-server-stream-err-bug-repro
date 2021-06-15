@@ -18,8 +18,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match response {
         Ok(response) => {
             let mut stream = response.into_inner();
-            while let Err(status) = block_on(stream.message()) {
-                print!("{:?}", status);
+            loop {
+                match block_on(stream.message()) {
+                    Ok(response) => print!("{:?}", response),
+                    Err(status) => print!("{:?}", status)
+                }
             }
         }
         Err(e) => println!("{}", e.message()),
