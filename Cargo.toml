@@ -1,0 +1,31 @@
+[package]
+name = "tonic-server-stream-err-bug-repro"
+version = "0.1.0"
+authors = ["STRONG-MAD <mayan.shoshani7@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "err_client"
+path = "src/err_client/main.rs"
+
+[[bin]]
+name = "trace_client"
+path = "src/trace_client/main.rs"
+
+[[bin]]
+name = "server"
+path = "src/server/main.rs"
+
+[dependencies]
+prost = "0.7.0"
+prost-types = "0.7.0"
+futures = "0.3.15"
+async-stream = "0.3.2"
+tokio = { version = "1.6.1", features = ["full"] }
+tokio-stream = { version ="0.1.6", features = ["default", "sync"] }
+tonic = "0.4.3"
+
+[build-dependencies]
+tonic-build = "0.4.2"

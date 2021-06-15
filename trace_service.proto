@@ -1,0 +1,23 @@
+syntax = "proto3";
+package trace_service;
+
+service TraceService {
+  rpc Trace (TraceRequest) returns (stream TraceResponse);
+  rpc SendErr (SendErrRequest) returns (SendErrResponse);
+}
+
+message TraceRequest {
+  string message = 1;
+}
+
+message TraceResponse {
+  string message = 1;
+}
+
+message SendErrRequest {
+  string message = 1;
+}
+
+message SendErrResponse {
+  string message = 1;
+}
